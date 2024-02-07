@@ -11,7 +11,6 @@ from telegram.ext import Updater, CommandHandler
 BSCSCAN_KEY = config("BSCSCAN_KEY")
 APP_URL = config("APP_URL")
 TOKEN = config("TOKEN")
-BOT_OWNER = config("BOTOWNER")
 
 watch_db = pickledb.load("watch.db", True)
 
@@ -71,7 +70,17 @@ def start_command(update, context):
     chat_id = update.effective_chat.id
     context.bot.send_message(
         chat_id=chat_id,
-        text="***************\n\nHey there! I am a Telegram bot by @Nimak86.\n\nI am here to watch BNB Smart Chain addresses. I will ping you if there's a change in balance. This is useful if you've just sent a transaction and want to be notified when it arrives. Due to API limitations, I can watch an address for no more than 24 hours.\n\n<b>Commands</b>\n\n* <code>/watch (address)</code> - start watching an address.\n* <code>/forget (address)</code> - stop watching an address.\n* <code>/list</code> - list the addresses you are watching.\n\nHave fun :)",
+        text="""🔥🔥🔥🔥🔥\n
+Hey there! I am a Telegram bot by @Nimak86.
+
+I am here to watch BNB Smart Chain addresses. I will ping you if there's a change in balance. 
+This is useful if you've just sent a transaction and want to be notified when it arrives.
+Due to API limitations, I can watch an address for no more than 24 hours.
+<b>Commands</b>
+    * <code>/watch (address)</code> - start watching an address.
+    * <code>/forget (address)</code> - stop watching an address.
+    * <a>/list</a> - list the addresses you are watching.
+Have fun! 💫💫💫""",
         parse_mode=ParseMode.HTML,
     )
 
@@ -96,21 +105,15 @@ def watch_command(update, context):
             chat_id=chat_id,
             text=f"Started watching the address {eth_address}\nIt currently has {balance_to_display} BNB.",
         )
-        # Debug admin message for the bot owner
-        context.bot.send_message(
-            chat_id=BOT_OWNER,
-            text=f"--> ADMIN MESSAGE\nSomeone started watching the address\n{eth_address}\n",
-        )
     else:
         context.bot.send_message(
             chat_id=chat_id,
-            text="This is not a valid BSC address.\nType /watch followed by a valid BSC address like this:\n<code>/watch 0xB91986a9854be250aC681f6737836945D7afF6Fa</code>",
+            text="""
+            This is not a valid BSC address.
+            Type /watch followed by a valid BSC address like this:
+            <code>/watch 0xB91986a9854be250aC681f6737836945D7afF6Fa</code>
+            """,
             parse_mode=ParseMode.HTML,
-        )
-        # Debug admin message for the bot owner
-        context.bot.send_message(
-            chat_id=BOT_OWNER,
-            text=f"--> ADMIN MESSAGE```python Invalid BSC address entered:\n{eth_address}\n",
         )
 
 
@@ -131,10 +134,10 @@ def forget_command(update, context):
                 chat_id=chat_id, text=f"Stopped watching the address {eth_address}"
             )
             # Debug admin message for the bot owner
-            context.bot.send_message(
-                chat_id=BOT_OWNER,
-                text=f"--> ADMIN MESSAGE\nSomeone stopped watching the address\n{eth_address}\n",
-            )
+            # context.bot.send_message(
+            #     chat_id=BOT_OWNER,
+            #     text=f"--> ADMIN MESSAGE\nSomeone stopped watching the address\n{eth_address}\n",
+            # )
         else:
             context.bot.send_message(
                 chat_id=chat_id, text="You are not watching this address."
@@ -144,11 +147,6 @@ def forget_command(update, context):
             chat_id=chat_id,
             text="This is not a valid BSC address.\nType /forget followed by a valid BSC address like this:\n<code>/forget 0xB91986a9854be250aC681f6737836945D7afF6Fa</code>",
             parse_mode=ParseMode.HTML,
-        )
-        # Debug admin message for the bot owner
-        context.bot.send_message(
-            chat_id=BOT_OWNER,
-            text=f"--> ADMIN MESSAGE\nInvalid BSC address entered:\n{eth_address}\n",
         )
 
 
@@ -161,11 +159,11 @@ def list_command(update, context):
             watch_entries.append(watch_db.get(entry))
 
     if len(watch_entries) > 0:
-        message = "<b>Addresses you are watching:</b>\n"
+        message = "⤵️<b>Addresses you are watching:</b>\n"
         for entry in watch_entries:
             balance_to_display = int(entry["current_balance"]) / 1e18
             balance_to_display = "{:.4f}".format(balance_to_display)
-            message += f"\n- <code>{entry['eth_address']}</code> (Balance: {balance_to_display} BNB)"
+            message += f"\n-<code>{entry['eth_address']}</code> \n\t💰(Balance: {balance_to_display} BNB)\n"
         context.bot.send_message(
             chat_id=chat_id, text=message, parse_mode=ParseMode.HTML
         )
@@ -192,7 +190,10 @@ def check_balances(context):
             balance_to_display = "{:.4f}".format(balance_to_display)
             context.bot.send_message(
                 chat_id=chat_id,
-                text=f"The balance of address {eth_address} has changed.\nIt is now {balance_to_display} BNB.",
+                text=f"""
+                The balance of address 🔗{eth_address} has changed.
+                It is now 💰 {balance_to_display} BNB
+                💸 The live BNB price today is $0 USD  """,
             )
             entry["current_balance"] = current_balance
             watch_db.set(f"{chat_id}_{eth_address}", entry)
