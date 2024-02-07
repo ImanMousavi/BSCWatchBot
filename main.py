@@ -15,6 +15,16 @@ TOKEN = config("TOKEN")
 watch_db = pickledb.load("watch.db", True)
 
 
+def get_bnb_price():
+    url = "https://api.binance.com/api/v3/ticker/price"
+    params = {"symbol": "BNBUSDT"}
+
+    response = requests.get(url, params=params)
+    data = response.json()
+    bnb_price = float(data["price"])
+    return bnb_price
+
+
 # Class to store addresses, previous balances and the Telegram chatID
 class WatchEntry:
     def __init__(self, chat_id, eth_address, current_balance, added_time):
@@ -133,11 +143,6 @@ def forget_command(update, context):
             context.bot.send_message(
                 chat_id=chat_id, text=f"Stopped watching the address {eth_address}"
             )
-            # Debug admin message for the bot owner
-            # context.bot.send_message(
-            #     chat_id=BOT_OWNER,
-            #     text=f"--> ADMIN MESSAGE\nSomeone stopped watching the address\n{eth_address}\n",
-            # )
         else:
             context.bot.send_message(
                 chat_id=chat_id, text="You are not watching this address."
@@ -186,14 +191,18 @@ def check_balances(context):
         balance_data = response.json()
         current_balance = balance_data["result"]
         if current_balance != entry["current_balance"]:
+
             balance_to_display = int(current_balance) / 1e18
             balance_to_display = "{:.4f}".format(balance_to_display)
+            bnb_price = get_bnb_price()
+            usd_balance = balance_to_display * bnb_price
+
             context.bot.send_message(
                 chat_id=chat_id,
                 text=f"""
-                The balance of address 🔗{eth_address} has changed.
-                It is now 💰 {balance_to_display} BNB
-                💸 The live BNB price today is $0 USD  """,
+The balance of address 🔗{eth_address} has changed.
+It is now {balance_to_display} BNB.
+The balance in USD is approximately 💰 ${usd_balance:.2f}. """,
             )
             entry["current_balance"] = current_balance
             watch_db.set(f"{chat_id}_{eth_address}", entry)
