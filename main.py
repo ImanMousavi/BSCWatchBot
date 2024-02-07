@@ -222,7 +222,7 @@ def main():
 
     # Schedule the balance check every 5 minutes
     job_queue = updater.job_queue
-    job_queue.run_repeating(check_balances, interval=30, first=0)
+    job_queue.run_repeating(check_balances, interval=5 * 60, first=0)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT, SIGTERM or SIGABRT
     updater.idle()
