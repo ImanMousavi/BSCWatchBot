@@ -159,6 +159,7 @@ def forget_command(update, context):
 def list_command(update, context):
     chat_id = update.effective_chat.id
     watch_entries = []
+    # check_balances(context)
     for entry in list(watch_db.getall()):
         if str(entry).startswith(str(chat_id)):
             watch_entries.append(watch_db.get(entry))
@@ -195,7 +196,7 @@ def check_balances(context):
             balance_to_display = int(current_balance) / 1e18
             balance_to_display = "{:.4f}".format(balance_to_display)
             bnb_price = get_bnb_price()
-            usd_balance = balance_to_display * bnb_price
+            usd_balance = float(balance_to_display) * bnb_price
 
             context.bot.send_message(
                 chat_id=chat_id,
@@ -232,7 +233,7 @@ def main():
 
     # Schedule the balance check every 5 minutes
     job_queue = updater.job_queue
-    job_queue.run_repeating(check_balances, interval=5 * 60, first=0)
+    job_queue.run_repeating(check_balances, interval=60, first=0)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT, SIGTERM or SIGABRT
     updater.idle()
