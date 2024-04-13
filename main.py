@@ -15,14 +15,15 @@ TOKEN = config("TOKEN")
 watch_db = pickledb.load("watch.db", True)
 
 
-def get_bnb_price():
-    url = "https://api.binance.com/api/v3/ticker/price"
-    params = {"symbol": "BNBUSDT"}
+def get_bnb_price() -> float:
+    url = "https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd"
+    response = requests.get(url)
 
-    response = requests.get(url, params=params)
-    data = response.json()
-    bnb_price = float(data["price"])
-    return bnb_price
+    if response.status_code == 200:
+        data = response.json()
+        return data["binancecoin"]["usd"]
+    else:
+        return 0.0
 
 
 # Class to store addresses, previous balances and the Telegram chatID
@@ -192,7 +193,6 @@ def check_balances(context):
         balance_data = response.json()
         current_balance = balance_data["result"]
         if current_balance != entry["current_balance"]:
-
             balance_to_display = int(current_balance) / 1e18
             balance_to_display = "{:.4f}".format(balance_to_display)
             bnb_price = get_bnb_price()
