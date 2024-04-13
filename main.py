@@ -167,10 +167,17 @@ def list_command(update, context):
 
     if len(watch_entries) > 0:
         message = "⤵️<b>Addresses you are watching:</b>\n"
+        total_balance = 0
         for entry in watch_entries:
             balance_to_display = int(entry["current_balance"]) / 1e18
+            total_balance += balance_to_display
             balance_to_display = "{:.4f}".format(balance_to_display)
-            message += f"\n-<code>{entry['eth_address']}</code> \n\t💰(Balance: {balance_to_display} BNB)\n"
+            message += f"\n-<code>{entry['eth_address']}</code> \n\t(Balance: {balance_to_display} BNB)\n"
+
+        bnb_price = get_bnb_price()
+        usd_balance = float(total_balance) * bnb_price
+
+        message += f"\n\nTotal Balance: ${usd_balance:.2f} ({total_balance:.4f} BNB) \n"
         context.bot.send_message(
             chat_id=chat_id, text=message, parse_mode=ParseMode.HTML
         )
@@ -201,7 +208,7 @@ def check_balances(context):
             context.bot.send_message(
                 chat_id=chat_id,
                 text=f"""
-The balance of address 🔗{eth_address} has changed.
+The balance of address {eth_address} has changed.
 It is now {balance_to_display} BNB.
 The balance in USD is approximately 💰 ${usd_balance:.2f}. """,
             )
@@ -233,7 +240,7 @@ def main():
 
     # Schedule the balance check every 5 minutes
     job_queue = updater.job_queue
-    job_queue.run_repeating(check_balances, interval=60, first=0)
+    job_queue.run_repeating(check_balances, interval=30, first=1)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT, SIGTERM or SIGABRT
     updater.idle()
