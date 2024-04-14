@@ -177,7 +177,7 @@ def list_command(update, context):
         bnb_price = get_bnb_price()
         usd_balance = float(total_balance) * bnb_price
 
-        message += f"\n\nTotal Balance: ${usd_balance:.2f} ({total_balance:.4f} BNB) \n"
+        message += f"\n\n🔥Total Balance: ${usd_balance:.2f} 🚀({total_balance:.4f} BNB) \n"
         context.bot.send_message(
             chat_id=chat_id, text=message, parse_mode=ParseMode.HTML
         )
@@ -210,7 +210,7 @@ def check_balances(context):
                 text=f"""
 The balance of address {eth_address} has changed.
 It is now {balance_to_display} BNB.
-The balance in USD is approximately 💰 ${usd_balance:.2f}. """,
+The balance in USD is approximately 🚀 ${usd_balance:.2f}. """,
             )
             entry["current_balance"] = current_balance
             watch_db.set(f"{chat_id}_{eth_address}", entry)
